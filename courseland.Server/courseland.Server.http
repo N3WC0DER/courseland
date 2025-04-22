@@ -1,0 +1,6 @@
+@courseland.Server_HostAddress = http://localhost:5089
+
+GET {{courseland.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
