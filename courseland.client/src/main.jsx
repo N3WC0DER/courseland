@@ -1,10 +1,32 @@
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App.jsx'
+import Welcome from './Welcome.jsx'
+import Dashboard from './dashboard/Dashboard.jsx'
+import './main.scss';
+import Users from './dashboard/users/Users.jsx';
 
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
+    <StrictMode>
+        <Router>
+            <Routes>
+                <Route path="/">
+                    <Route index element={<Welcome />} />
+
+                    <Route path="dashboard">
+                        <Route path="home">
+                            <Route index element={<Dashboard page="dashboard" />} />
+                        </Route>
+                        <Route path="users">
+                            <Route index element={<Dashboard page={ <Users /> } />} />
+                        </Route>
+                        <Route path="stats">
+                            <Route index element={<Dashboard page="stats" />} />
+                        </Route>
+                    </Route>
+                </Route>
+                <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+        </Router>
+    </StrictMode>,
 )

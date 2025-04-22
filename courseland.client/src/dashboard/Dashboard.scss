@@ -1,0 +1,11 @@
+﻿#dashboard {
+    display: flex;
+    flex-direction: row;
+    height: 100vh;
+
+    #page {
+        padding: 40px;
+
+        flex-grow: 1;
+    }
+}

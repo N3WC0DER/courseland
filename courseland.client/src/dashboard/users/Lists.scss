@@ -1,0 +1,33 @@
+﻿@import '../../main.scss';
+
+#users-list, #requests-list {
+    overflow-y: auto;
+
+    .user-item, .request-item {
+        display: flex;
+        align-items: center;
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+        font-family: $font-secondary;
+        font-size: $font-size-small;
+
+        .id, .name, .date {
+            flex: 1;
+        }
+
+        button {
+            padding: 5px 10px;
+            background-color: $secondary-color;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: $font-secondary;
+            font-size: $font-size-small;
+
+            &:hover {
+                background-color: $secondary-hover;
+            }
+        }
+    }
+}
