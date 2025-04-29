@@ -1,4 +1,6 @@
 ﻿using courseland.Server;
+using courseland.Server.Models;
+using courseland.Server.Repositories;
 using courseland.Server.Services;
 using Microsoft.EntityFrameworkCore;
 using MimeKit;
@@ -16,6 +18,13 @@ builder.Services.AddLogging();
 
 string connection = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(connection));
+
+// Repositories
+builder.Services.AddScoped<IRepository<User>, BaseRepository<User>>();
+builder.Services.AddScoped<IRepository<UserRole>, BaseRepository<UserRole>>();
+
+builder.Services.AddScoped<ICourseRepository, CourseRepository>();
+builder.Services.AddScoped<IApplicationRepository, ApplicationRepository>();
 
 var emailConfiguration = builder.Configuration.GetRequiredSection("Email");
 
@@ -65,5 +74,21 @@ app.UseCors("AllowLocalhostOrigin");
 app.MapControllers();
 
 app.MapFallbackToFile("/index.html");
+
+// mock db data
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<ApplicationContext>();
+        MockDbInitializer.Initialize(context);
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "Error when filling the database with initial data");
+    }
+}
 
 app.Run();
