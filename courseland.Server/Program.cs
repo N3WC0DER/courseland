@@ -1,7 +1,10 @@
-﻿using courseland.Server;
+﻿using AgroLink.Server.Filters;
+using courseland.Server;
 using courseland.Server.Models;
 using courseland.Server.Repositories;
 using courseland.Server.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using MimeKit;
 
@@ -18,6 +21,18 @@ builder.Services.AddLogging();
 
 string connection = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(connection));
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowSpecificOrigin",
+        policy =>
+        {
+            policy.WithOrigins("https://localhost:15035") // change it
+                  .AllowAnyHeader()
+                  .AllowAnyMethod()
+                  .AllowCredentials();
+        });
+});
 
 // Repositories
 builder.Services.AddScoped<IRepository<User>, BaseRepository<User>>();
@@ -36,21 +51,39 @@ builder.Services.AddSingleton(services =>
     )
 );
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<BaseExceptionFilterAttribute>();
+});
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// ASPNETCORE_HTTPS_PORT
-// ASPNETCORE_URLS
-// TODO: replace to env variables!!!
+builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    })
+    .AddCookie(options =>
+    {
+        options.Cookie.Name = "auth_cookie";
+        options.Cookie.SameSite = SameSiteMode.None;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        options.Cookie.HttpOnly = false;
+        options.Events.OnRedirectToLogin = context =>
+        {
+            context.Response.StatusCode = 401;
+            return Task.CompletedTask;
+        };
+    });
+builder.Services.AddAuthorization();
 
-builder.Services.AddCors(options =>
+builder.Services.ConfigureApplicationCookie(options =>
 {
-    options.AddPolicy("AllowLocalhostOrigin",
-        builder => builder.WithOrigins("https://localhost:15035")
-                            .AllowAnyHeader()
-                            .AllowAnyMethod());
+    options.Events.OnRedirectToLogin = context =>
+    {
+        context.Response.StatusCode = 401;
+        return Task.CompletedTask;
+    };
 });
 
 var app = builder.Build();
@@ -67,9 +100,10 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseAuthorization();
+app.UseCors("AllowSpecificOrigin");
 
-app.UseCors("AllowLocalhostOrigin");
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllers();
 

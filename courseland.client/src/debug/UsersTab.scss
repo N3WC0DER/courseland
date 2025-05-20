@@ -1,0 +1,129 @@
+﻿.users-tab {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+    .table-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        h3 {
+            margin: 0;
+            color: #333;
+        }
+    }
+
+    .table-container {
+        position: relative;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        overflow-x: auto;
+    }
+
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+            white-space: pre;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            font-weight: 500;
+            color: #555;
+        }
+
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        tr {
+            td:first-child {
+                width: 5%;
+            }
+        }
+
+        tr.editing {
+            background-color: #f0f7ff;
+
+            input {
+                padding: 8px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                width: 100%;
+
+                &:focus {
+                    outline: none;
+                    border-color: #4d90fe;
+                }
+            }
+
+            input.empty-required {
+                -webkit-box-shadow: 0px 0px 6px 3px rgba(254, 0, 0, 0.2);
+                -moz-box-shadow: 0px 0px 6px 3px rgba(254, 0, 0, 0.2);
+                box-shadow: 0px 0px 6px 3px rgba(254, 0, 0, 0.2);
+            }
+        }
+
+        .actions-cell {
+            width: 60px;
+        }
+    }
+
+    .actions {
+        display: flex;
+        flex-direction: row;
+
+        button {
+            text-align: left;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            color: #333;
+
+            &:hover {
+                background-color: #f5f5f5;
+            }
+
+            &:last-child {
+                color: #dc3545;
+            }
+
+            svg {
+                font-size: 16px;
+            }
+        }
+    }
+
+    .btn-icon {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 5px;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #666;
+
+        &:hover {
+            background-color: rgba(0,0,0,0.05);
+            color: #333;
+        }
+
+        &.success {
+            color: #198754;
+        }
+
+        &.failure {
+            color: #198754;
+        }
+    }
+}

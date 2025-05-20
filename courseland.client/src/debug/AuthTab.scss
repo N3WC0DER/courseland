@@ -1,0 +1,101 @@
+﻿.auth-tab {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+    .card {
+        background: white;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+
+        h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: #333;
+            font-weight: 500;
+        }
+    }
+
+    .session-card {
+        .session-info {
+            display: flex;
+            gap: 20px;
+
+            .info-item {
+                display: flex;
+                flex-direction: column;
+
+                .label {
+                    font-size: 14px;
+                    color: #666;
+                    margin-bottom: 4px;
+                }
+
+                .value {
+                    font-weight: 500;
+                    color: #333;
+                }
+            }
+        }
+    }
+
+    .role-actions {
+        .action-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+
+            .action-item {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+
+                .role-btn {
+                    flex-shrink: 0;
+                }
+
+                .action-hint {
+                    font-size: 14px;
+                    color: #666;
+
+                    .highlight {
+                        color: blue;
+                        font-weight: 500;
+                    }
+                }
+            }
+        }
+    }
+
+    .login-form {
+        .form-group {
+            margin-bottom: 15px;
+
+            label {
+                display: block;
+                margin-bottom: 6px;
+                font-weight: 500;
+                color: #444;
+            }
+
+            input {
+                width: 40%;
+                padding: 10px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                font-size: 14px;
+
+                &:focus {
+                    outline: none;
+                    border-color: #4d90fe;
+                    box-shadow: 0 0 0 2px rgba(77, 144, 254, 0.2);
+                }
+            }
+        }
+    }
+
+    .reset-btn {
+        align-self: flex-start;
+    }
+}

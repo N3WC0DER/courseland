@@ -4,6 +4,10 @@ export const domain = "https://localhost:7170";
 export const prefixV1 = "/api/v1";
 
 export const API = {
+    users: domain + prefixV1 + "/users",
+    roles: domain + prefixV1 + "/users/roles",
+    login: domain + prefixV1 + "/users/login",
+    logout: domain + prefixV1 + "/users/logout",
     registration_request: domain + prefixV1 + "/registration/requests"
 }
 

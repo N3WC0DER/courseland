@@ -8,6 +8,7 @@ export default class Welcome extends Component {
         super(props);
 
         this.state = { counter: 0 };
+
     }
 
     onSubmit(formData) {

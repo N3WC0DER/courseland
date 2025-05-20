@@ -2,6 +2,9 @@
 {
     public class UserDto
     {
+        // maybe add [remote] attr ? https://metanit.com/sharp/aspnetmvc/9.3.php
+        // or validation attribute with application context <- yes
+        // for roles.
         public int Id { get; set; }
         public required string Name { get; set; }
         public required string Email { get; set; }
