@@ -7,7 +7,6 @@
         public required string Description { get; set; }
         public required decimal Price { get; set; }
         public required int DurationInHours { get; set; }
-        public int CategoryId { get; set; }
         public required Category Category { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public required bool IsActive { get; set; }

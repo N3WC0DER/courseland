@@ -27,7 +27,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowSpecificOrigin",
         policy =>
         {
-            policy.WithOrigins("https://localhost:15035") // change it
+            policy.WithOrigins("http://localhost:5173") // change it
                   .AllowAnyHeader()
                   .AllowAnyMethod()
                   .AllowCredentials();
@@ -35,11 +35,12 @@ builder.Services.AddCors(options =>
 });
 
 // Repositories
-builder.Services.AddScoped<IRepository<User>, BaseRepository<User>>();
 builder.Services.AddScoped<IRepository<UserRole>, BaseRepository<UserRole>>();
+builder.Services.AddScoped<IRepository<Category>, BaseRepository<Category>>();
 
 builder.Services.AddScoped<ICourseRepository, CourseRepository>();
 builder.Services.AddScoped<IApplicationRepository, ApplicationRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 var emailConfiguration = builder.Configuration.GetRequiredSection("Email");
 

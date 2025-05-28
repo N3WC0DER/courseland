@@ -1,6 +1,6 @@
-﻿using courseland.Server.Models;
+﻿using courseland.Server.Exceptions;
+using courseland.Server.Models;
 using Microsoft.EntityFrameworkCore;
-using System;
 
 namespace courseland.Server.Repositories
 {
@@ -8,15 +8,33 @@ namespace courseland.Server.Repositories
     {
         public ApplicationRepository(ApplicationContext context) : base(context) { }
 
-        public async Task<IEnumerable<Application>> GetByStatusAsync(ApplicationStatus status)
-            => await _context.Applications
-                .Where(a => a.Status == status)
-                .Include(a => a.Course)
-                .ToListAsync();
+        public async Task<IEnumerable<Application>> GetAllWithCourseAsync()
+            => await this.GetAllAsync(
+                includes: query => query.Include(a => a.Course).Include(a => a.Course.Category)
+            );
 
-        public async Task<int> GetCountByCourseAsync(int courseId)
-            => await _context.Applications
-                .Include(a => a.Course)
-                .CountAsync(a => a.Course.Id == courseId);
+        public async Task<Application> GetByIdWithCourseAsync(int id)
+        {
+            var applicaiton = await this.GetByIdAsync(id,
+                includes: query => query.Include(a => a.Course).Include(a => a.Course.Category)
+            );
+
+            if (applicaiton == null)
+            {
+                throw new NotFoundException("Application not found");
+            }
+
+            return applicaiton;
+        }
+
+        public async Task SetNoteAsync(int id, string? note)
+        {
+            var application = await this.GetByIdAsync(id);
+            if (application == null)
+            {
+                throw new NotFoundException("Application not found");
+            }
+            application.Notes = note;
+        }
     }
 }

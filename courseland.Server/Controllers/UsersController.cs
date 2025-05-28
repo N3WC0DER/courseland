@@ -1,12 +1,10 @@
-﻿using System.Data;
-using System.Security.Claims;
-using AgroLink.Server.Filters;
+﻿using System.Security.Claims;
+using courseland.Server.Filters;
 using courseland.Server.Models;
 using courseland.Server.Models.DTO;
 using courseland.Server.Repositories;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -20,75 +18,34 @@ namespace courseland.Server.Controllers
     {
 
         private ILogger<UsersController> _logger;
-        private readonly IRepository<User> _users;
+        private readonly IUserRepository _users;
 
-        public UsersController(ILogger<UsersController> logger, IRepository<User> users)
+        public UsersController(ILogger<UsersController> logger, IUserRepository users)
         {
             _logger = logger;
             _users = users;
-        }
-
-        // POST: api/v1/users/login
-        [HttpPost("login")]
-        public async Task<IActionResult> Login(UserLoginDto login,
-                                               [FromServices] IRepository<UserRole> roles)
-        {
-            if (string.IsNullOrWhiteSpace(login.Email) || string.IsNullOrWhiteSpace(login.Password))
-                return BadRequest("Email and password cannot be empty.");
-
-            var users = await _users.GetAllAsync(includes: query => query.Include(u => u.Role));
-            var target = users.FirstOrDefault(x => x.Email == login.Email && x.PasswordHash == login.Password, null);
-            if (target is null)
-                return Unauthorized();
-
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimsIdentity.DefaultNameClaimType, target.Email),
-                new Claim(ClaimsIdentity.DefaultRoleClaimType, target.Role.Name)
-            };
-            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
-            await HttpContext.SignInAsync(claimsPrincipal);
-
-            return Ok(new
-            {
-                name = target.Name,
-                email = target.Email,
-                role = target.Role.Name,
-            });
-        }
-
-        // GET: api/v1/users/logout
-        [HttpGet("logout")]
-        public async Task<IActionResult> Logout()
-        {
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            return Ok();
         }
 
         // GET: api/v1/users
         [HttpGet]
         [Authorize(Roles = "admin")]
         public async Task<IActionResult> Get()
-            => Ok(await _users.GetAllAsync(
-                    includes: query => query.Include(u => u.Role)
-                ));
+        {
+            var users = await _users.GetAllWithRoleAsync();
+
+            return Ok(users.Select(UserDto.FromUser));
+        }
 
         // GET: api/v1/users/{id}
         [HttpGet("{id}")]
         [Authorize(Roles = "admin")]
+        [NotFoundExceptionFilter]
         public async Task<IActionResult> Get(int id)
-            => Ok(await _users.GetByIdAsync(id,
-                    includes: query => query.Include(u => u.Role)
-                ));
+        {
+            var user = await _users.GetByIdWithRoleAsync(id);
 
-        // GET: api/v1/users/roles
-        [HttpGet("roles")]
-        [Authorize(Roles = "admin")]
-        public async Task<IActionResult> GetRoles([FromServices] IRepository<UserRole> roles)
-            => Ok(await roles.GetAllAsync());
-
-        // todo: add postRole();
+            return Ok(UserDto.FromUser(user));
+        }
 
         // POST: api/v1/users
         [HttpPost]
@@ -141,6 +98,25 @@ namespace courseland.Server.Controllers
         {
             await _users.DeleteAsync(id);
             return NoContent();
+        }
+
+        // Patch: api/v1/users/change_role
+        [HttpPatch("change_role")]
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> ChangeRole(int id, string roleName, [FromServices] IRepository<UserRole> roles)
+        {
+            var role = (await roles.GetAllAsync(
+                    filter: r => r.Name == roleName
+                )).First();
+
+            if (role == null)
+            {
+                return NotFound();
+            }
+
+            await _users.ChangeRoleAsync(id, role);
+            await _users.SaveChangesAsync();
+            return Ok();
         }
     }
 }
